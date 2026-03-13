@@ -71,6 +71,8 @@ We welcome contributions from the community! Follow our instructions in [CONTRIB
 
 Please read [Code of Conduct](docs/CODE_OF_CONDUCT.md) before contributing.
 
+Contributions generated entirely by bots or agents without substantial human involvement will not be accepted, and bot accounts may be blocked.
+
 ## 👏 Acknowledgments
 
 This project builds upon the excellent work of **[`browser-use`](https://github.com/browser-use/browser-use)**.
