@@ -1,17 +1,20 @@
 import {
-	ChevronDown,
 	Copy,
 	CornerUpLeft,
+	ExternalLink,
 	Eye,
 	EyeOff,
+	FoldVertical,
 	HatGlasses,
 	Home,
 	Loader2,
+	Scale,
+	UnfoldVertical,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
 
-import { DEMO_API_KEY } from '@/agent/constants'
+import { DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/agent/constants'
 import type { ExtConfig, LanguagePreference } from '@/agent/useAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -33,6 +36,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [experimentalLlmsTxt, setExperimentalLlmsTxt] = useState(
 		config?.experimentalLlmsTxt ?? false
 	)
+	const [disableNamedToolChoice, setDisableNamedToolChoice] = useState(
+		config?.disableNamedToolChoice ?? false
+	)
 	const [advancedOpen, setAdvancedOpen] = useState(false)
 	const [saving, setSaving] = useState(false)
 	const [userAuthToken, setUserAuthToken] = useState<string>('')
@@ -48,6 +54,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		setMaxSteps(config?.maxSteps)
 		setSystemInstruction(config?.systemInstruction ?? '')
 		setExperimentalLlmsTxt(config?.experimentalLlmsTxt ?? false)
+		setDisableNamedToolChoice(config?.disableNamedToolChoice ?? false)
 	}, [config])
 
 	// Poll for user auth token every second until found
@@ -93,6 +100,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				maxSteps: maxSteps || undefined,
 				systemInstruction: systemInstruction || undefined,
 				experimentalLlmsTxt,
+				disableNamedToolChoice,
 			})
 		} finally {
 			setSaving(false)
@@ -152,6 +160,16 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				</div>
 			</div>
 
+			{/* Hub link */}
+			<a
+				href="/hub.html"
+				target="_blank"
+				className="flex items-center justify-between p-3 rounded-md border bg-muted/50 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
+			>
+				Manage Page Agent Hub
+				<ExternalLink className="size-3" />
+			</a>
+
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Base URL</label>
 				<Input
@@ -165,7 +183,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Model</label>
 				<Input
-					placeholder="gpt-5.2"
+					placeholder="gpt-5.1"
 					value={model}
 					onChange={(e) => setModel(e.target.value)}
 					className="text-xs h-8"
@@ -177,7 +195,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				<div className="flex gap-2 items-center">
 					<Input
 						type={showApiKey ? 'text' : 'password'}
-						placeholder="sk-..."
+						// placeholder="sk-..."
 						value={apiKey}
 						onChange={(e) => setApiKey(e.target.value)}
 						className="text-xs h-8"
@@ -194,7 +212,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			</div>
 
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">Language</label>
+				<label className="text-xs text-muted-foreground">Response Language</label>
 				<select
 					value={language ?? ''}
 					onChange={(e) => setLanguage((e.target.value || undefined) as LanguagePreference)}
@@ -213,10 +231,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer mt-1 font-bold"
 			>
 				Advanced
-				<ChevronDown
-					className="size-3 transition-transform"
-					style={{ transform: advancedOpen ? 'rotate(0deg)' : 'rotate(90deg)' }}
-				/>
+				{advancedOpen ? <FoldVertical className="size-3" /> : <UnfoldVertical className="size-3" />}
 			</button>
 
 			{advancedOpen && (
@@ -244,6 +259,11 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 							className="text-xs rounded-md border border-input bg-background px-3 py-2 resize-y min-h-[60px]"
 						/>
 					</div>
+
+					<label className="flex items-center justify-between cursor-pointer">
+						<span className="text-xs text-muted-foreground">Disable named tool_choice</span>
+						<Switch checked={disableNamedToolChoice} onCheckedChange={setDisableNamedToolChoice} />
+					</label>
 
 					<label className="flex items-center justify-between cursor-pointer">
 						<span className="text-xs text-muted-foreground">Experimental llms.txt support</span>

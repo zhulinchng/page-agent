@@ -34,6 +34,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'claude-sonnet-3.5',
 	],
 	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
+	MiniMax: ['MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed'],
 	MoonshotAI: ['kimi-k2.5'],
 	'Z.AI': ['glm-5', 'glm-4.7'],
 }
@@ -118,10 +119,10 @@ export default function Models() {
 const pageAgent = new PageAgent({
   baseURL: 'https://api.openai.com/v1',
   apiKey: 'your-api-key',
-  model: 'gpt-4.1-mini'
+  model: 'gpt-5.4-mini'
 });
 
-// Self-hosted models (e.g., Ollama)
+// Self-hosted models (e.g., Ollama) — no apiKey needed
 const pageAgent = new PageAgent({
   baseURL: 'http://localhost:11434/v1',
   apiKey: 'NA',
@@ -222,7 +223,6 @@ LLM_MODEL_NAME="llama3.2"`}
 				<CodeEditor
 					code={`const agent = new PageAgent({
   baseURL: '/api/llm-proxy',
-  apiKey: 'NA',
   model: 'gpt-5.1',
   customFetch: (url, init) =>
     fetch(url, { ...init, credentials: 'include' }),

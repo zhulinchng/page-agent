@@ -29,6 +29,12 @@ export class OpenAIClient implements LLMClient {
 		const openaiTools = Object.entries(tools).map(([name, t]) => zodToOpenAITool(name, t))
 
 		// Build request body
+
+		let toolChoice: unknown = 'required'
+		if (options?.toolChoiceName && !this.config.disableNamedToolChoice) {
+			toolChoice = { type: 'function', function: { name: options.toolChoiceName } }
+		}
+
 		const requestBody: Record<string, unknown> = {
 			model: this.config.model,
 			temperature: this.config.temperature,
@@ -50,7 +56,7 @@ export class OpenAIClient implements LLMClient {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${this.config.apiKey}`,
+					...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
 				},
 				body: JSON.stringify(requestBody),
 				signal: abortSignal,
